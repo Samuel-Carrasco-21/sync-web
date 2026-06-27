@@ -15,10 +15,12 @@ export type CreditApplication = {
   id: string
   preclientName: string
   phone: string
+  nit: string
   economicActivity: string
   requestedAmount: number
   businessDescription: string
   status: ApplicationStatus
+  address: string
   submittedAt: string
   summary: {
     detectedIncome: number
@@ -38,6 +40,8 @@ export const mockApplications: CreditApplication[] = [
     id: 'APP-001',
     preclientName: 'María Quispe Huanca',
     phone: '76543210',
+    nit: '123456789',
+    address: 'Zona 16 de Julio, El Alto, La Paz',
     economicActivity: 'Tienda de abarrotes',
     requestedAmount: 8000,
     businessDescription:
@@ -92,6 +96,8 @@ export const mockApplications: CreditApplication[] = [
     id: 'APP-002',
     preclientName: 'Carlos Mamani Condori',
     phone: '71234567',
+    nit: '987654321',
+    address: 'Plaza del Estudiante, La Paz',
     economicActivity: 'Venta de comida (salteñas y api)',
     requestedAmount: 5000,
     businessDescription:
@@ -138,6 +144,8 @@ export const mockApplications: CreditApplication[] = [
     id: 'APP-003',
     preclientName: 'Rosa Choque Flores',
     phone: '68901234',
+    nit: '192837465',
+    address: 'Zona Sur, La Paz (ventas por WhatsApp)',
     economicActivity: 'Comercio por WhatsApp (ropa y accesorios)',
     requestedAmount: 12000,
     businessDescription:
@@ -194,6 +202,8 @@ export const mockApplications: CreditApplication[] = [
     id: 'APP-004',
     preclientName: 'Juan Apaza Ticona',
     phone: '72345678',
+    nit: '564738291',
+    address: 'Av. Montes, La Paz',
     economicActivity: 'Almacén de repuestos automotrices',
     requestedAmount: 20000,
     businessDescription:

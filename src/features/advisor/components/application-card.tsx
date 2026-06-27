@@ -1,11 +1,18 @@
-import { CalendarIcon, ChevronRightIcon, TrendingUpIcon } from 'lucide-react'
-import { Link } from '@tanstack/react-router'
-import { StatusBadge } from '@/shared/components/status-badge'
-import { formatCurrency, formatDate } from '@/shared/lib/formatters'
-import type { CreditApplication } from '@/data/mock-applications'
+import {
+  CalendarIcon,
+  ChevronRightIcon,
+  MapPinIcon,
+  PhoneIcon,
+  TrendingUpIcon,
+  BadgeIcon,
+} from "lucide-react";
+import { Link } from "@tanstack/react-router";
+import { StatusBadge } from "@/shared/components/status-badge";
+import { formatCurrency, formatDate } from "@/shared/lib/formatters";
+import type { CreditApplication } from "@/data/mock-applications";
 
 interface ApplicationCardProps {
-  application: CreditApplication
+  application: CreditApplication;
 }
 
 export function ApplicationCard({ application }: ApplicationCardProps) {
@@ -23,31 +30,61 @@ export function ApplicationCard({ application }: ApplicationCardProps) {
             </h3>
             <StatusBadge status={application.status} />
           </div>
-          <p className="mt-0.5 text-xs text-muted-foreground">{application.economicActivity}</p>
+          <p className="mt-0.5 text-xs text-muted-foreground">
+            {application.economicActivity}
+          </p>
         </div>
         <ChevronRightIcon className="mt-0.5 h-4 w-4 shrink-0 text-muted-foreground" />
       </div>
 
-      <div className="mt-3 flex flex-wrap gap-4">
+      <div className="mt-3 flex flex-wrap gap-x-5 gap-y-2">
         <div className="flex items-center gap-1 text-xs text-muted-foreground">
           <TrendingUpIcon className="h-3.5 w-3.5" />
           <span>
-            Solicita <span className="font-medium text-foreground">{formatCurrency(application.requestedAmount)}</span>
+            Solicita{" "}
+            <span className="font-medium text-foreground">
+              {formatCurrency(application.requestedAmount)}
+            </span>
           </span>
         </div>
+
         <div className="flex items-center gap-1 text-xs text-muted-foreground">
           <CalendarIcon className="h-3.5 w-3.5" />
           <span>{formatDate(application.submittedAt)}</span>
         </div>
-      </div>
 
-      {application.alerts.length > 0 && (
-        <div className="mt-2">
-          <span className="inline-flex items-center gap-1 rounded-full bg-orange-50 px-2 py-0.5 text-xs text-orange-700">
-            {application.alerts.length} {application.alerts.length === 1 ? 'alerta' : 'alertas'}
+        <div className="flex items-center gap-1 text-xs text-muted-foreground">
+          <BadgeIcon className="h-3.5 w-3.5" />
+          <span>
+            NIT{" "}
+            <span className="font-medium text-foreground">
+              {application.nit}
+            </span>
           </span>
         </div>
-      )}
+
+        <div className="flex items-center gap-1 text-xs text-muted-foreground">
+          <PhoneIcon className="h-3.5 w-3.5" />
+          <span className="font-medium text-foreground">
+            {application.phone}
+          </span>
+        </div>
+
+        <div className="flex items-center gap-1 text-xs text-muted-foreground">
+          <MapPinIcon className="h-3.5 w-3.5" />
+          <span className="truncate max-w-45">{application.address}</span>
+        </div>
+      </div>
+
+      <div className="mt-2 flex items-center gap-2">
+        {application.alerts.length > 0 && (
+          <span className="inline-flex items-center gap-1 rounded-full bg-orange-50 px-2 py-0.5 text-xs text-orange-700">
+            {application.alerts.length}{" "}
+            {application.alerts.length === 1 ? "alerta" : "alertas"}
+          </span>
+        )}
+        <span className="text-xs text-muted-foreground">{application.id}</span>
+      </div>
     </Link>
-  )
+  );
 }

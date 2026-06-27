@@ -1,65 +1,80 @@
-import { useState } from 'react'
-import { SearchIcon } from 'lucide-react'
-import { ApplicationCard } from './application-card'
-import { EmptyState } from '@/shared/components/empty-state'
-import type { CreditApplication } from '@/data/mock-applications'
-import type { ApplicationStatus } from '@/shared/types/common'
-
-const ALL_STATUSES = 'Todos'
-const STATUS_OPTIONS: (ApplicationStatus | typeof ALL_STATUSES)[] = [
+import { useState, useCallback } from "react";
+import { ApplicationCard } from "./application-card";
+import { FilterPanel } from "./filter-panel";
+import { FilterDrawer } from "./filter-drawer";
+import { EmptyState } from "@/shared/components/empty-state";
+import {
+  applyFilters,
+  exportToCSV,
+  DEFAULT_FILTERS,
   ALL_STATUSES,
-  'Pendiente',
-  'En revisión',
-  'Observado',
-  'Listo para análisis',
-]
+} from "./application-filters";
+import type { FilterState } from "./application-filters";
+import type { CreditApplication } from "@/data/mock-applications";
 
 interface ApplicationListProps {
-  applications: CreditApplication[]
+  applications: CreditApplication[];
+}
+
+/** Count how many filter fields are non-default (for the FAB badge). */
+function countActiveFilters(filters: FilterState): number {
+  let n = 0;
+  if (filters.search) n++;
+  if (filters.phone) n++;
+  if (filters.nit) n++;
+  if (filters.economicActivity) n++;
+  if (filters.amountMin) n++;
+  if (filters.amountMax) n++;
+  if (filters.dateFrom) n++;
+  if (filters.dateTo) n++;
+  if (filters.status !== ALL_STATUSES) n++;
+  return n;
 }
 
 export function ApplicationList({ applications }: ApplicationListProps) {
-  const [search, setSearch] = useState('')
-  const [statusFilter, setStatusFilter] = useState<ApplicationStatus | typeof ALL_STATUSES>(ALL_STATUSES)
+  const [filters, setFilters] = useState<FilterState>(DEFAULT_FILTERS);
+  const [drawerOpen, setDrawerOpen] = useState(false);
 
-  const filtered = applications.filter((app) => {
-    const matchesSearch =
-      app.preclientName.toLowerCase().includes(search.toLowerCase()) ||
-      app.economicActivity.toLowerCase().includes(search.toLowerCase())
-    const matchesStatus = statusFilter === ALL_STATUSES || app.status === statusFilter
-    return matchesSearch && matchesStatus
-  })
+  const handleChange = useCallback((patch: Partial<FilterState>) => {
+    setFilters((prev) => ({ ...prev, ...patch }));
+  }, []);
+
+  const handleReset = useCallback(() => {
+    setFilters(DEFAULT_FILTERS);
+  }, []);
+
+  const filtered = applyFilters(applications, filters);
+  const activeFilterCount = countActiveFilters(filters);
+
+  const handleExport = useCallback(() => {
+    exportToCSV(filtered);
+  }, [filtered]);
 
   return (
-    <div className="space-y-4">
-      {/* Search */}
-      <div className="relative">
-        <SearchIcon className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-        <input
-          type="text"
-          placeholder="Buscar por nombre o actividad..."
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          className="w-full rounded-lg border bg-card px-10 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
-        />
-      </div>
+    // Extra bottom padding on mobile/tablet so the FAB never sits on top of a card
+    <div className="space-y-4 pb-24 lg:pb-0">
+      {/* Desktop inline panel */}
+      <FilterPanel
+        filters={filters}
+        resultCount={filtered.length}
+        activeFilterCount={activeFilterCount}
+        onChange={handleChange}
+        onReset={handleReset}
+        onExport={handleExport}
+      />
 
-      {/* Status filter */}
-      <div className="flex flex-wrap gap-2">
-        {STATUS_OPTIONS.map((status) => (
-          <button
-            key={status}
-            onClick={() => setStatusFilter(status as ApplicationStatus | typeof ALL_STATUSES)}
-            className={`rounded-full border px-3 py-1 text-xs font-medium transition-colors ${
-              statusFilter === status
-                ? 'border-foreground bg-foreground text-background'
-                : 'border-border bg-card text-muted-foreground hover:border-foreground hover:text-foreground'
-            }`}
-          >
-            {status}
-          </button>
-        ))}
-      </div>
+      {/* Mobile/tablet: FAB + drawer (rendered in DOM but visually hidden on lg+) */}
+      <FilterDrawer
+        open={drawerOpen}
+        filters={filters}
+        resultCount={filtered.length}
+        activeFilterCount={activeFilterCount}
+        onOpen={() => setDrawerOpen(true)}
+        onClose={() => setDrawerOpen(false)}
+        onChange={handleChange}
+        onReset={handleReset}
+        onExport={handleExport}
+      />
 
       {/* Results */}
       {filtered.length === 0 ? (
@@ -75,5 +90,5 @@ export function ApplicationList({ applications }: ApplicationListProps) {
         </div>
       )}
     </div>
-  )
+  );
 }
