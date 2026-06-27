@@ -10,7 +10,7 @@ import {
   ALL_STATUSES,
 } from "./application-filters";
 import type { FilterState } from "./application-filters";
-import type { CreditApplication } from "@/data/mock-applications";
+import type { CreditApplication } from "@/shared/types/application";
 
 interface ApplicationListProps {
   applications: CreditApplication[];

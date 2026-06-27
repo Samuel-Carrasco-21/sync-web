@@ -1,3 +1,4 @@
+/* eslint-disable react-refresh/only-export-components -- route file exports Route + component */
 import { createRootRoute, Outlet, useNavigate, useLocation } from '@tanstack/react-router'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { AppHeader } from '@/shared/components/app-header'

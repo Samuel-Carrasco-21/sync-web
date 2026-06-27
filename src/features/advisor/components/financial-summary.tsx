@@ -1,22 +1,27 @@
 import { TrendingUpIcon, TrendingDownIcon, ScaleIcon, ActivityIcon, FileTextIcon, ShieldIcon } from 'lucide-react'
 import { SummaryCard } from '@/shared/components/summary-card'
 import { formatCurrency } from '@/shared/lib/formatters'
-import type { CreditApplication } from '@/data/mock-applications'
+import type { CreditApplication } from '@/shared/types/application'
 
 interface FinancialSummaryProps {
   summary: CreditApplication['summary']
 }
 
+// Risk: low is good (green), high is bad (red).
 const riskColors: Record<string, string> = {
   Bajo: 'text-green-700',
   Moderado: 'text-yellow-700',
+  Media: 'text-yellow-700',
   Alto: 'text-red-700',
+  Alta: 'text-red-700',
 }
 
+// Frequency / documentary evidence: high is good (green), low is bad (red).
 const levelColors: Record<string, string> = {
   Alta: 'text-green-700',
   Media: 'text-yellow-700',
   Baja: 'text-red-700',
+  Bajo: 'text-red-700',
 }
 
 export function FinancialSummary({ summary }: FinancialSummaryProps) {
