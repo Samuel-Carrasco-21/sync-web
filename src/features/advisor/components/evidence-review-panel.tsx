@@ -1,22 +1,30 @@
-import { BookOpenIcon, QrCodeIcon, ReceiptIcon, FileTextIcon, PackageIcon, FileIcon } from 'lucide-react'
+import {
+  BookOpenIcon,
+  QrCodeIcon,
+  ReceiptIcon,
+  FileTextIcon,
+  PackageIcon,
+  FileIcon,
+} from 'lucide-react'
+import type { ReactNode } from 'react'
 import { cn } from '@/lib/utils'
 import { formatCurrency } from '@/shared/lib/formatters'
-import type { Evidence } from '@/data/mock-applications'
-import type { EvidenceType, EvidenceStatus } from '@/shared/types/common'
+import type { Evidence } from '@/shared/types/application'
 
-const evidenceIcons: Record<EvidenceType, React.ReactNode> = {
-  'Cuaderno de ventas': <BookOpenIcon className="h-4 w-4" />,
-  'Comprobante QR': <QrCodeIcon className="h-4 w-4" />,
-  Recibo: <ReceiptIcon className="h-4 w-4" />,
-  Factura: <FileTextIcon className="h-4 w-4" />,
-  Inventario: <PackageIcon className="h-4 w-4" />,
-  Otro: <FileIcon className="h-4 w-4" />,
+const documentTypeIcons: Record<string, ReactNode> = {
+  sales_notebook: <BookOpenIcon className="h-4 w-4" />,
+  qr_receipt: <QrCodeIcon className="h-4 w-4" />,
+  purchase_receipt: <ReceiptIcon className="h-4 w-4" />,
+  expense_note: <FileTextIcon className="h-4 w-4" />,
+  mixed: <PackageIcon className="h-4 w-4" />,
 }
 
-const evidenceStatusConfig: Record<EvidenceStatus, { label: string; className: string }> = {
-  Cargado: { label: 'Cargado', className: 'bg-gray-100 text-gray-700' },
-  Procesado: { label: 'Procesado', className: 'bg-green-100 text-green-700' },
-  Revisar: { label: 'Revisar', className: 'bg-orange-100 text-orange-700' },
+const statusClasses: Record<string, string> = {
+  uploaded: 'bg-gray-100 text-gray-700',
+  processing: 'bg-blue-100 text-blue-700',
+  processed: 'bg-green-100 text-green-700',
+  review: 'bg-orange-100 text-orange-700',
+  failed: 'bg-red-100 text-red-700',
 }
 
 interface EvidenceReviewPanelProps {
@@ -24,6 +32,19 @@ interface EvidenceReviewPanelProps {
 }
 
 export function EvidenceReviewPanel({ evidences }: EvidenceReviewPanelProps) {
+  if (evidences.length === 0) {
+    return (
+      <div className="space-y-3">
+        <h2 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
+          Evidencias presentadas
+        </h2>
+        <div className="rounded-xl border bg-card p-4 text-sm text-muted-foreground">
+          No se subieron evidencias para esta solicitud.
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div className="space-y-3">
       <h2 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
@@ -31,26 +52,26 @@ export function EvidenceReviewPanel({ evidences }: EvidenceReviewPanelProps) {
       </h2>
       <div className="space-y-2">
         {evidences.map((ev) => {
-          const statusCfg = evidenceStatusConfig[ev.status]
+          const icon = (ev.documentType && documentTypeIcons[ev.documentType]) ?? (
+            <FileIcon className="h-4 w-4" />
+          )
+          const statusClass = statusClasses[ev.status] ?? 'bg-gray-100 text-gray-700'
           return (
             <div key={ev.id} className="rounded-xl border bg-card p-4 shadow-sm">
               <div className="flex items-start gap-3">
                 <div className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-muted text-muted-foreground">
-                  {evidenceIcons[ev.type]}
+                  {icon}
                 </div>
                 <div className="min-w-0 flex-1">
                   <div className="flex flex-wrap items-center gap-2">
                     <span className="truncate text-sm font-medium text-foreground">{ev.name}</span>
                     <span
-                      className={cn(
-                        'rounded-full px-2 py-0.5 text-xs font-medium',
-                        statusCfg.className,
-                      )}
+                      className={cn('rounded-full px-2 py-0.5 text-xs font-medium', statusClass)}
                     >
-                      {statusCfg.label}
+                      {ev.statusLabel}
                     </span>
                   </div>
-                  <p className="mt-0.5 text-xs text-muted-foreground">{ev.type}</p>
+                  <p className="mt-0.5 text-xs text-muted-foreground">{ev.documentTypeLabel}</p>
 
                   {ev.detectedAmount !== undefined && (
                     <p className="mt-1 text-sm font-medium text-green-700">
@@ -64,7 +85,11 @@ export function EvidenceReviewPanel({ evidences }: EvidenceReviewPanelProps) {
                         <div
                           className={cn(
                             'h-full rounded-full',
-                            ev.confidence >= 0.85 ? 'bg-green-500' : ev.confidence >= 0.70 ? 'bg-yellow-500' : 'bg-red-500',
+                            ev.confidence >= 0.85
+                              ? 'bg-green-500'
+                              : ev.confidence >= 0.7
+                                ? 'bg-yellow-500'
+                                : 'bg-red-500',
                           )}
                           style={{ width: `${ev.confidence * 100}%` }}
                         />

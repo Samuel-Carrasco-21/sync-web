@@ -4,7 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { EvidenceUploader } from "../components/evidence-uploader";
 import { SubmissionSuccess } from "../components/submission-success";
-import { submitApplication } from "../services/preclient.mock-service";
+import { submitApplication } from "../services/preclient.service";
 import type { UploadedEvidence } from "../types/preclient.types";
 import { SendIcon } from "lucide-react";
 
@@ -57,6 +57,7 @@ type FormData = z.infer<typeof schema>;
 export function PreclientPage() {
   const [evidences, setEvidences] = useState<UploadedEvidence[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
   const [result, setResult] = useState<{
     success: boolean;
     applicationId: string;
@@ -73,9 +74,9 @@ export function PreclientPage() {
 
   const onSubmit = async (data: FormData) => {
     setIsSubmitting(true);
+    setSubmitError(null);
     try {
       const payload = {
-        fullName: data.fullName,
         preclientName: data.fullName,
         phone: data.phone,
         nit: `${data.nit}-${data.nitComplement}`,
@@ -86,6 +87,10 @@ export function PreclientPage() {
       };
       const res = await submitApplication(payload, evidences);
       setResult(res);
+    } catch (err) {
+      setSubmitError(
+        err instanceof Error ? err.message : "No se pudo enviar la solicitud. Intentá de nuevo.",
+      );
     } finally {
       setIsSubmitting(false);
     }
@@ -286,6 +291,11 @@ export function PreclientPage() {
         </div>
 
         {/* ── Submit ── */}
+        {submitError && (
+          <div className="rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-700">
+            {submitError}
+          </div>
+        )}
         <button
           type="submit"
           disabled={isSubmitting}

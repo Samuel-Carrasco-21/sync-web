@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query'
 import { ApplicationList } from '../components/application-list'
-import { getApplications } from '../services/advisor.mock-service'
+import { getApplications } from '../services/advisor.service'
 
 export function AdvisorPage() {
   const { data: applications, isLoading, isError } = useQuery({

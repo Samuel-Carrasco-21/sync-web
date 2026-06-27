@@ -65,13 +65,13 @@ export function EvidenceUploader({ evidences, onChange }: EvidenceUploaderProps)
         <UploadCloudIcon className="mb-2 h-8 w-8 text-muted-foreground" />
         <p className="text-sm font-medium text-foreground">Subir comprobantes y evidencias</p>
         <p className="mt-0.5 text-xs text-muted-foreground">
-          Arrastrá archivos acá o hacé clic para seleccionar · Fotos, PDF
+          Arrastrá archivos acá o hacé clic para seleccionar · Fotos (JPG, PNG, WEBP)
         </p>
         <input
           ref={fileInputRef}
           type="file"
           multiple
-          accept="image/*,application/pdf"
+          accept="image/jpeg,image/png,image/webp"
           className="hidden"
           onChange={(e) => handleFiles(e.target.files)}
         />

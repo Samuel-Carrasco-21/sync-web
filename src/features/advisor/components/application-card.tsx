@@ -9,7 +9,7 @@ import {
 import { Link } from "@tanstack/react-router";
 import { StatusBadge } from "@/shared/components/status-badge";
 import { formatCurrency, formatDate } from "@/shared/lib/formatters";
-import type { CreditApplication } from "@/data/mock-applications";
+import type { CreditApplication } from "@/shared/types/application";
 
 interface ApplicationCardProps {
   application: CreditApplication;
@@ -77,13 +77,13 @@ export function ApplicationCard({ application }: ApplicationCardProps) {
       </div>
 
       <div className="mt-2 flex items-center gap-2">
-        {application.alerts.length > 0 && (
+        {application.alertsCount > 0 && (
           <span className="inline-flex items-center gap-1 rounded-full bg-orange-50 px-2 py-0.5 text-xs text-orange-700">
-            {application.alerts.length}{" "}
-            {application.alerts.length === 1 ? "alerta" : "alertas"}
+            {application.alertsCount}{" "}
+            {application.alertsCount === 1 ? "alerta" : "alertas"}
           </span>
         )}
-        <span className="text-xs text-muted-foreground">{application.id}</span>
+        <span className="text-xs text-muted-foreground">{application.applicationCode}</span>
       </div>
     </Link>
   );

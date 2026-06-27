@@ -2,7 +2,6 @@ import { useEffect, useRef } from "react";
 import { X, Download, SlidersHorizontal } from "lucide-react";
 import type { FilterState, StatusOption } from "./application-filters";
 import { ALL_STATUSES } from "./application-filters";
-import type { ApplicationStatus } from "@/shared/types/common";
 
 const STATUS_OPTIONS: StatusOption[] = [
   ALL_STATUSES,

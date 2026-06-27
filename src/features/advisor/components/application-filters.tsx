@@ -1,5 +1,5 @@
 import type { ApplicationStatus } from "@/shared/types/common";
-import type { CreditApplication } from "@/data/mock-applications";
+import type { CreditApplication } from "@/shared/types/application";
 
 export const ALL_STATUSES = "Todos" as const;
 
