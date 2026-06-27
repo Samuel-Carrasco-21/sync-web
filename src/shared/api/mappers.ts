@@ -19,7 +19,12 @@ function toNumber(value: string | null | undefined): number {
 }
 
 export function mapAlert(dto: AlertDto): AlertItem {
-  return { level: dto.level, message: dto.message, levelLabel: dto.level_label }
+  return {
+    level: dto.level,
+    message: dto.message,
+    levelLabel: dto.level_label,
+    evidenceId: dto.evidence_id ?? null,
+  }
 }
 
 export function mapEvidence(dto: EvidenceDto): Evidence {
@@ -33,6 +38,7 @@ export function mapEvidence(dto: EvidenceDto): Evidence {
     detectedAmount: dto.detected_amount != null ? toNumber(dto.detected_amount) : undefined,
     confidence: dto.confidence_score ?? undefined,
     extractedText: dto.extracted_text ?? undefined,
+    errorMessage: dto.error_message ?? undefined,
   }
 }
 

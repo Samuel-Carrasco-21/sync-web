@@ -5,6 +5,7 @@ export type AlertItem = {
   level: string // 'info' | 'warning' | 'error'
   message: string
   levelLabel?: string | null
+  evidenceId?: string | null // media asset this alert refers to, or null for general alerts
 }
 
 export type Transaction = {
@@ -36,6 +37,7 @@ export type Evidence = {
   detectedAmount?: number
   confidence?: number
   extractedText?: string
+  errorMessage?: string // model/SDK feedback when status is 'failed'
 }
 
 export type FinancialSummaryView = {

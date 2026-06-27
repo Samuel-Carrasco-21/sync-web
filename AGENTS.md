@@ -90,7 +90,7 @@ Field mapping (frontend camelCase view-model ⇄ backend snake_case DTO) lives i
 | `summary.*` (numbers)      | `financial_summary.*` (money strings/labels) |
 | `evidences[]`              | `evidences[]` (filename/document_type_label/status_label/detected_amount/confidence_score/extracted_text) |
 | `transactions[]`           | `transactions[]`                          |
-| `alerts: {level,message}[]`| `alerts: [{level, message}]`              |
+| `alerts: {level,message,evidenceId}[]` | `alerts: [{level, message, evidence_id}]` — `evidence_id` links the alert to an evidence (shown on its card); `null` = general alert |
 | `advisorNotes`             | `advisor_notes`                           |
 
 Status raw values: `pending | in_review | observed | ready_for_analysis` (filter also allows `all`).

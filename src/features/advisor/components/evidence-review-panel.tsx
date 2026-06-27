@@ -6,12 +6,14 @@ import {
   PackageIcon,
   FileIcon,
   DownloadIcon,
+  AlertCircleIcon,
 } from 'lucide-react'
 import type { ReactNode } from 'react'
 import { cn } from '@/lib/utils'
 import { mediaDownloadUrl } from '@/shared/api/client'
 import { formatCurrency } from '@/shared/lib/formatters'
-import type { Evidence } from '@/shared/types/application'
+import type { AlertItem, Evidence } from '@/shared/types/application'
+import { AlertList, alertLevelStyles, dominantAlertLevel } from './alert-list'
 
 const documentTypeIcons: Record<string, ReactNode> = {
   sales_notebook: <BookOpenIcon className="h-4 w-4" />,
@@ -31,9 +33,11 @@ const statusClasses: Record<string, string> = {
 
 interface EvidenceReviewPanelProps {
   evidences: Evidence[]
+  /** All management alerts; those whose evidenceId matches an evidence are shown on its card. */
+  alerts?: AlertItem[]
 }
 
-export function EvidenceReviewPanel({ evidences }: EvidenceReviewPanelProps) {
+export function EvidenceReviewPanel({ evidences, alerts = [] }: EvidenceReviewPanelProps) {
   if (evidences.length === 0) {
     return (
       <div className="space-y-3">
@@ -58,6 +62,9 @@ export function EvidenceReviewPanel({ evidences }: EvidenceReviewPanelProps) {
             <FileIcon className="h-4 w-4" />
           )
           const statusClass = statusClasses[ev.status] ?? 'bg-gray-100 text-gray-700'
+          const evidenceAlerts = alerts.filter((a) => a.evidenceId === ev.id)
+          const alertLevel = dominantAlertLevel(evidenceAlerts)
+          const alertStyle = alertLevelStyles[alertLevel] ?? alertLevelStyles.warning
           return (
             <div key={ev.id} className="rounded-xl border bg-card p-4 shadow-sm">
               <div className="flex items-start gap-3">
@@ -74,6 +81,20 @@ export function EvidenceReviewPanel({ evidences }: EvidenceReviewPanelProps) {
                     </span>
                   </div>
                   <p className="mt-0.5 text-xs text-muted-foreground">{ev.documentTypeLabel}</p>
+
+                  {ev.errorMessage && (
+                    <div className="mt-2 flex gap-2 rounded-lg border border-red-200 bg-red-50 p-2">
+                      <AlertCircleIcon className="mt-0.5 h-4 w-4 shrink-0 text-red-600" />
+                      <div className="min-w-0">
+                        <p className="text-xs font-medium text-red-800">
+                          No se pudo procesar la evidencia
+                        </p>
+                        <p className="mt-0.5 wrap-break-word text-xs leading-relaxed text-red-700">
+                          {ev.errorMessage}
+                        </p>
+                      </div>
+                    </div>
+                  )}
 
                   {ev.detectedAmount !== undefined && (
                     <p className="mt-1 text-sm font-medium text-green-700">
@@ -100,6 +121,22 @@ export function EvidenceReviewPanel({ evidences }: EvidenceReviewPanelProps) {
                         {Math.round(ev.confidence * 100)}% confianza
                       </span>
                     </div>
+                  )}
+
+                  {evidenceAlerts.length > 0 && (
+                    <details className="mt-2" open={alertLevel === 'error'}>
+                      <summary
+                        className={cn(
+                          'inline-flex cursor-pointer items-center gap-1.5 text-xs font-medium',
+                          alertStyle.text,
+                        )}
+                      >
+                        {alertStyle.icon}
+                        Ver {evidenceAlerts.length}{' '}
+                        {evidenceAlerts.length === 1 ? 'alerta' : 'alertas'}
+                      </summary>
+                      <AlertList alerts={evidenceAlerts} dense className="mt-1.5" />
+                    </details>
                   )}
 
                   {ev.extractedText && (

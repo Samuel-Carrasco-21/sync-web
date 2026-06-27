@@ -49,6 +49,7 @@ export type AlertDto = {
   level: string
   message: string
   level_label: string | null
+  evidence_id: string | null
 }
 
 export type EvidenceDto = {
@@ -61,6 +62,7 @@ export type EvidenceDto = {
   detected_amount: string | null
   confidence_score: number | null
   extracted_text: string | null
+  error_message: string | null
 }
 
 export type TransactionDto = {

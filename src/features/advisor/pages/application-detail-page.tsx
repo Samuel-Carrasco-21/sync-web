@@ -116,6 +116,13 @@ export function ApplicationDetailPage() {
 
   const currentStatus = selectedStatus ?? application.rawStatus
 
+  // Alerts that point at a known evidence are rendered on that evidence's card;
+  // anything else (or an alert with no evidence) falls back to the general section.
+  const evidenceIds = new Set(application.evidences.map((e) => e.id))
+  const generalAlerts = application.alerts.filter(
+    (a) => !a.evidenceId || !evidenceIds.has(a.evidenceId),
+  )
+
   const handleDialogSubmit = (values: TransactionFormValues) => {
     if (dialog.mode === 'edit' && dialog.editing) {
       editTxMutation.mutate({ id: dialog.editing.id, values })
@@ -191,7 +198,7 @@ export function ApplicationDetailPage() {
 
       {/* Evidence + add evidence */}
       <div className="space-y-3">
-        <EvidenceReviewPanel evidences={application.evidences} />
+        <EvidenceReviewPanel evidences={application.evidences} alerts={application.alerts} />
         <div>
           <input
             ref={fileInputRef}
@@ -221,7 +228,7 @@ export function ApplicationDetailPage() {
         </div>
       </div>
 
-      <RiskAlerts alerts={application.alerts} />
+      <RiskAlerts alerts={generalAlerts} />
 
       <AdvisorNotes
         initialNotes={application.advisorNotes ?? ''}
