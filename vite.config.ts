@@ -20,4 +20,7 @@ export default defineConfig({
       '@': path.resolve(__dirname, './src'),
     },
   },
+  server: {
+    allowedHosts: ['.localhost', '.local', '.ngrok.io', '.dpdns.org', '.vercel.app'],
+  },
 })
