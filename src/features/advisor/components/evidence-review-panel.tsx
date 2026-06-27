@@ -5,9 +5,11 @@ import {
   FileTextIcon,
   PackageIcon,
   FileIcon,
+  DownloadIcon,
 } from 'lucide-react'
 import type { ReactNode } from 'react'
 import { cn } from '@/lib/utils'
+import { mediaDownloadUrl } from '@/shared/api/client'
 import { formatCurrency } from '@/shared/lib/formatters'
 import type { Evidence } from '@/shared/types/application'
 
@@ -110,6 +112,17 @@ export function EvidenceReviewPanel({ evidences }: EvidenceReviewPanelProps) {
                       </pre>
                     </details>
                   )}
+
+                  <a
+                    href={mediaDownloadUrl(ev.id)}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    download={ev.name}
+                    className="mt-2 inline-flex items-center gap-1 text-xs font-medium text-foreground hover:underline"
+                  >
+                    <DownloadIcon className="h-3.5 w-3.5" />
+                    Descargar original
+                  </a>
                 </div>
               </div>
             </div>

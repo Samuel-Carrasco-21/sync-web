@@ -65,3 +65,7 @@ export function apiPostForm<T>(path: string, formData: FormData): Promise<T> {
 export function apiPost<T>(path: string): Promise<T> {
   return fetch(`${BASE_URL}${path}`, { method: 'POST' }).then((r) => handleResponse<T>(r))
 }
+
+export function mediaDownloadUrl(mediaAssetId: string): string {
+  return `${BASE_URL}/media/${mediaAssetId}/original`
+}
