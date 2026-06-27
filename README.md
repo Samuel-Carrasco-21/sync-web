@@ -1,71 +1,68 @@
-# Caja Inteligente - Aplicación Móvil (MVP)
+# Caja Inteligente — Frontend Web (MVP)
 
-Este repositorio contiene el código de la aplicación móvil para **Caja Inteligente**, diseñada como una herramienta para estructurar datos financieros y reducir el riesgo de crédito en visitas de campo. El proyecto está enfocado estrictamente en un Producto Mínimo Viable (MVP), priorizando la legibilidad, la practicidad y la sincronización eficiente de datos sin sobreingeniería.
+Frontend del MVP **Caja Inteligente**: una herramienta para que un asesor de crédito estructure
+la información financiera de comerciantes informales en Bolivia. La app permite crear solicitudes
+de crédito, subir evidencias (fotos de cuaderno de ventas, comprobantes QR, recibos), y revisar la
+información financiera extraída por IA en el backend.
 
-## 📐 Arquitectura del Proyecto
+> ⚠️ Versiones anteriores de este README describían una app Flutter. **No es Flutter.** La
+> aplicación real está construida con **React + TypeScript + Vite**. Ver [`AGENTS.md`](./AGENTS.md)
+> para la arquitectura y el contrato de integración con el backend.
 
-El sistema utiliza una **Arquitectura Limpia Simplificada**, dividida en cuatro capas bien definidas:
+## Stack
 
-### 1. Domain
-- **Contiene:** Entidades y contratos de repositorios.
-- **Restricciones:** No debe depender de Flutter, Drift, Dio, Cubit, Modular, ni widgets de UI.
+- React 19 + TypeScript + Vite
+- TanStack Router (ruteo basado en archivos) y TanStack Query (estado del servidor)
+- react-hook-form + zod (formularios)
+- Tailwind CSS v4 + shadcn/ui + lucide-react
+- Gestor de paquetes: **pnpm**
 
-### 2. Application
-- **Contiene:** Cubits, estados (States) y el motor de sincronización (`SyncEngine`).
-- **Restricciones:** Coordina el comportamiento pero no debe renderizar UI.
+## Roles (sin login)
 
-### 3. Infrastructure
-- **Contiene:** Implementaciones de repositorios, operaciones de base de datos con Drift, y llamadas al `FakeBackendService`.
-- **Restricciones:** Es la única capa que debe depender de Drift y del backend simulado.
+- **Precliente:** completa el formulario y sube comprobantes para solicitar un crédito.
+- **Asesor de crédito:** lista/filtra solicitudes, abre el detalle, revisa el resumen financiero,
+  evidencias y transacciones; agrega/edita/rechaza transacciones, agrega evidencia, escribe notas y
+  cambia el estado.
 
-### 4. Presentation
-- **Contiene:** Páginas y widgets.
-- **Restricciones:** No debe acceder a Drift directamente, no debe contener lógica de sincronización ni reglas de negocio. Los widgets solo renderizan la UI en español y disparan acciones de los Cubits.
+## Requisitos
 
-## 📦 Gestión de Estado
+- Node 20+ y pnpm
+- El backend **sync-core** corriendo (por defecto en `http://localhost:8000`)
 
-Toda la gestión de estado se maneja con `flutter_bloc` utilizando **Cubit**.
+## Puesta en marcha
 
-*   **`ManagementsCubit`**: Carga y filtra registros de gestiones. Expone estados: `initial`, `loading`, `empty`, `loaded`, `error`.
-*   **`ManagementFormCubit`**: Crea, edita y valida datos simples de formularios de gestión. Expone estados: `initial`, `loading`, `success`, `error`.
-*   **`SyncCubit`**: Carga la cola de sincronización, el resumen, ejecuta la sincronización manual y reintenta operaciones fallidas. Expone estados: `initial`, `loading`, `loaded`, `syncing`, `error`.
+```bash
+pnpm install
 
-## 💾 Base de Datos
+# Configurar la URL del backend
+echo "VITE_API_BASE_URL=http://localhost:8000/api/v1" > .env
 
-Implementada con **Drift + SQLite**. 
-Contiene estrictamente solo estas dos tablas:
-1. `managements`
-2. `sync_queue`
+pnpm dev      # http://localhost:5173
+```
 
-*(Nota: No se deben implementar tablas para logs opcionales o bitácoras).*
+## Scripts
 
-## 🧭 Navegación
+```bash
+pnpm dev      # servidor de desarrollo
+pnpm build    # tsc -b && vite build
+pnpm preview  # previsualizar el build
+pnpm lint     # eslint
+```
 
-Implementada con **flutter_modular**. 
+## Estructura
 
-**Rutas permitidas:**
-- `/managements`
-- `/managements/form`
-- `/managements/form/:localId`
-- `/sync`
+```
+src/
+├── routes/        # rutas (delgadas) que renderizan páginas de features
+├── features/
+│   ├── preclient/ # flujo del solicitante
+│   └── advisor/   # flujo del asesor
+└── shared/
+    ├── api/       # cliente HTTP, DTOs y mappers (única capa que llama al backend)
+    ├── components/
+    ├── lib/       # formateadores es-BO, cn()
+    └── types/     # view-models, enums y etiquetas
+```
 
-**Estructura principal:** 2 pestañas inferiores (Bottom Tabs): *Gestiones* y *Cola*.
-
-## 🎨 Guía de Estilo UI
-
-El diseño sigue un estilo "Fintech moderno", limpio y funcional:
-
-- **Fondo:** `#f2f3f5`
-- **Primario (Oscuro):** `#202020`
-- **Acento (Lima):** `#c9f158`
-- **Tarjetas:** `#ffffff` (blancas, con bordes redondeados y sombras suaves).
-- **Botones:** Negros (`#202020`).
-- **Espaciado:** Limpio y estructurado.
-- **Idioma:** Todo el texto de la interfaz y mensajes de error **deben** estar en español (ej. *"No se pudieron cargar las gestiones."*, *"La operación falló después de 3 intentos."*).
-
-## 🚫 Restricciones de Implementación (Lo que NO se debe hacer)
-- No incluir sistema de login o perfil de usuario.
-- No conectar a una API real (usar `FakeBackendService`).
-- No implementar detección de conectividad real o tareas en segundo plano.
-- No incluir notificaciones push, animaciones complejas, ni abstracciones innecesarias.
-- Mantener nombres descriptivos y claros (evitar nombres vagos como `Manager`, `Helper`, `DataService`).
+Toda la interfaz y los mensajes están en **español**. La integración con el backend (endpoints,
+mapeo de campos, formatos de dinero y estados) está documentada en [`AGENTS.md`](./AGENTS.md).
